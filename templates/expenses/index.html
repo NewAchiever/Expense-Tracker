@@ -1,60 +1,125 @@
 {% extends 'base.html' %}
 
+
 {% load static %}
 
 {% block content %}
 <div class="container mt-4">
-    <div class="row m-3">
+    <div class="row m-1">
         <div class="col-md-9">
             <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                  <li class="breadcrumb-item"><a href="">Expenses</a></li>
+                <ol class="breadcrumb float-start">
+                  <li class="breadcrumb-item"><a href=""  class="text-decoration-none">Expenses</a></li>
                   <li class="breadcrumb-item active" aria-current="page">My Expenses</li>
                 </ol>
             </nav>
         </div>
-    
         <div class="col-md-2">
-            <a href="{% url 'add-expense' %}" class="btn btn-primary">Add Expense</a>
+            <a href="{% url 'add-expense' %}" class="btn btn-primary float-end">Add Expense</a>
         </div>
     </div>
 </div>
 
-
-<div class="container">
+<div class="container w-96">
     {% include 'partials/_messages.html' %}
-    {% if expenses.count %}
-
-    <div class="row">
-        <div class="col-md-8"></div>
-        <div class="col md-4">
-            <div class="form-group">
-                <input type="text" class="form-control" id="searchField" placeholder="Search">
+    <div class="d-flex py-2 align-items-center">
+        <img src="{% static 'icons/filter.png' %}" style="height:16px;width:16px"/>
+        <span  class="mx-1" onclick="document.querySelector('#filterDiv').toggleAttribute('hidden')">Add Filter</span>
+    </div>
+    <div class="bg-body-tertiary p-2 position-relative border border-1" id="filterDiv" hidden>
+        <button type="button" onclick="document.querySelector(`#filterDiv`).toggleAttribute('hidden')" class="btn-close position-absolute top-0 end-0 m-2" style="height:5px;width:5px" aria-label="Close"></button>
+        <form class="row px-2 g-0" id="apply-filter-expenses" name="expenseFilterForm" method="post"> 
+            {% csrf_token %}
+            <div class="col g-0 mx-2">
+                <label class="my-2">
+                    Amount Range:
+                </label>
+                <div class="row g-0">
+                    <div class="col-5">
+                        <input type="number" name="f_gt_amount" id="f_gt_amount" class="rounded-left w-100 p-2 border-0" placeholder="From"/>
+                    </div>
+                    <span class="bg-white m-0 p-1" style="width:20px">-</span>
+                    <div class="col-5">
+                        <input type="number" name="f_lt_amount" id="f_lt_amount" value="{{fieldValues.f_lt_amount}}" class="w-100 p-2 border-0" placeholder="To"/>
+                    </div>
+                </div>
             </div>
             
-        </div>
+            <div class="col col-2 g-0 mx-2">
+                <label class="my-2">
+                    Category:
+                </label>
+                <div class="row g-0">
+                    <div class="dropdown" id="categoryDropDownMenuParent">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" id="categoryDropDownMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Dropdown
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="categoryDropDownMenu" id="categoryMenu">
+                            {% for category in categories %}
+                                <button class="dropdown-item" id="dropDownCategoryItem" type="button"><input type="checkbox" name="{{category}}" id="f_ca_{{category}}" value="{{category}}" class="mx-1 pb-0 align-items-center" style="height:15px;width:15px"><span class="justify-center align-items-center">{{category}}</span></button>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col g-0 mx-2">
+                <label class="my-2">
+                    Description:
+                </label>
+                <div class="row g-0">
+                    <div class="col">
+                        <input type="text" name="f_description" value="{{fieldValues.f_description}}" class="rounded-left w-100 p-2 border-0" placeholder="Descript"/>
+                    </div>
+                </div>
+            </div>
+            <div class="col g-0 mx-2">
+                <label class="my-2">
+                    Date Range:
+                </label>
+                <div class="row g-0">
+                    <div class="col-md-6">
+                        <input type="date" name="f_gt_date" class="rounded-left w-100 p-2 border-0"  value="{{fieldValues.f_gt_date}}" placeholder="Date"/>
+                    </div>
+                    <span class="bg-white m-0 p-1" style="width:20px">-</span>
+                    <div class="col-md-5">
+                        <input type="date" name="f_lt_date" class="w-100 p-2 border-0"  value="{{fieldValues.f_lt_date}}" placeholder="Date"/>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-8"></div>
+                <div class="col-md-4">
+                    <input type="submit" name="submit" class="btn btn-primary float-end" id="submit-filter" value="Apply Filter"/>
+                </div>
+            </div>
+        </form>
     </div>
+    <div class="my-3" id="expensesFilterTags">
 
-    
-    <div class="app-table">
-        <table class="table table-stripped table-hover">
+    </div>
+    {% if expenses.count %}
+    <div class="mt-4">
+        
+        <table class="table table-bordered  table-hover">
             <thead>
                 <tr>
+                    <th>#</th>
                     <th>Amount ({{currency}})</th>
                     <th>Category</th>
                     <th>Description</th>
-                    <th>Date</th>
-                    <th></th>
+                    <th colspan="2">Date</th>
+                    
                 </tr>
             </thead>
-            <tbody>
-                {% for expense in page_obj %}
+            <tbody id="expenses-table">
+                {% for expense in expenses %}
                 <tr>
+                    <td>{{forloop.counter}}</td>
                     <td>{{expense.amount}}</td>
                     <td>{{expense.category}}</td>
                     <td>{{expense.description}}</td>
                     <td>{{expense.date}}</td>
-                    <td><a href="{% url 'edit-expense' expense.id %}" class="btn btn-secondary btn-small">Edit</a></td>
+                    <td><a href="{% url 'edit-expense' expense.id %}" class="btn btn-primary btn-small">Edit</a></td>
                 </tr>
                 {% endfor %}
             </tbody>

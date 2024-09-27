@@ -1,7 +1,8 @@
 {% extends 'base-auth.html' %}
 {% load static %}
-{% block content %}
 
+{% block content %}
+{% include 'partials/_navbar.html' %}
 <div class="row">
     <div class="col-md-4"></div>
     <div class="col-md-4">
@@ -10,20 +11,23 @@
             
                 <div class="card-body">
                     <div class="card-title py-3">
-                        <h4>Login To your account</h4>
+                        <h4>Login to your account</h4>
                     </div>
-
-                    
-
                     <form action="{% url 'login' %}" method="post">
-                        
                         {% csrf_token %}
                         {% include 'partials/_messages.html' %}
                         <div class="form-group mb-3">
-                            <input type="text" name="username" placeholder="Username" id="usernameField" class="form-control" value="{{fieldValues.username}}"/>
+                            <input type="text" name="username" placeholder="Username" id="usernameField" class="form-control" value="{{fieldValues.username}}" required/>
                         </div>
                         <div class="form-group  mb-3">
-                            <input type="password" name="password" placeholder="Password" id="passwordField" class="form-control"/>    
+                            <input type="password" name="password" placeholder="Password" id="passwordField" class="form-control" required/>
+                            <div class="pt-3 flex">
+                                <input type="checkbox" name="rememberme" class="mx-1 pb-0 align-items-center" style="height:15px;width:15px" value="1"><span class="justify-center align-items-center"> Remember me</span>
+                                <small class="float-end showPasswordToggle align-items-center" value="visible"><img class="mx-2" style="height:22px;width:22px" id="visibleIcon" src="{% static 'icons/visible.png'%}" alt="visible"/></small>    
+                            </div>
+                            <div class="flex">
+                                <span class="justify-center align-items-center">Reset Password</span>  
+                            </div>
                         </div>
                         <div>
                             <input type="submit" value="Login" class="btn-block btn btn-primary mt-4" id="submitBtn"/>
@@ -35,5 +39,5 @@
     </div>
     <div class="col-md-3"></div>
 </div>
-<script src="{% static 'js/register.js' %}"></script>
+<script src="{% static 'js/main.js' %}"></script>
 {% endblock content %}

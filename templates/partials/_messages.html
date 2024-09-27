@@ -1,7 +1,9 @@
 {% if messages %}
-<ul class="messages">
+<ul class="messages p-0">
     {% for message in messages %}
-    <li {% if message.tags %} class="list-unstyled alert alert-sm alert-{{ message.tags }}" {% endif %}>
+
+    <li {% if message.tags %} class="list-unstyled alert alert-sm alert-{{ message.tags }} position-relative" id="message-id-{{ loop.index }}" {% endif %}>
+        <button type="button" onclick="document.querySelector(`#message-id-{{loop.index}}`).remove()" class="btn-close position-absolute top-0 end-0 m-2" style="height:5px;width:5px" aria-label="Close"></button>
         {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Important: {% endif %}
         {{ message }}
     </li>

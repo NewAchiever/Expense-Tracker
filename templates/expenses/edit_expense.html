@@ -1,8 +1,5 @@
 {% extends 'base.html' %}
-
-
 {% block content %}
-
 <div class="container mt-4">
     <div class="row">
         <div class="col-md-10">
@@ -13,46 +10,51 @@
                 </ol>
             </nav>
         </div>
-        <div class="col-md-2">
-            <a href="{% url 'delete-expense' expense.id %}" class="btn btn-danger btn-sm">Delete</a>
-        </div>
+        
     </div>
 
-    
-
-    <div class="card">
-        <div class="card-body">
+    <div class="card mt-4">
+        <div class="card-body mt-3">
             <form action="{% url 'edit-expense' expense.id %}" method="POST">
                 {% include 'partials/_messages.html' %}
                 {% csrf_token %}
-                <div class="form-group">
-                    <label for="">Amount</label>
-                    <input type="number" class="form-control form-control-sm" name="amount" value="{{values.amount}}">
+                <div class="form-group row m-2">
+                    <label for="" class="col-sm-3 col-form-label">Amount</label>
+                    <div class="col-sm-8">
+                        <input type="number" class="form-control" name="amount" value="{{values.amount}}">
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="">Description</label>
-                    <input type="text" class="form-control form-control-sm" name="description" value="{{values.description}}">
+                <div class="form-group row m-2">
+                    <label for="" class="col-sm-3 col-form-label">Description</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" name="description" value="{{values.description}}">
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="">Category</label>
-                    <select name="category" id="" class="form-control">
-                        
-                        {% for category in categories %}
-                            <option value="{{category.name}}" name="category">{{ category.name }}</option>
-                        {% endfor %}
-                    </select>
+                <div class="form-group row m-2">
+                    <label for="" class="col-sm-3 col-form-label">Category</label>
+                    <div class="col-sm-8">
+                        <select name="category" id="" class="form-control">
+                            {% for category in categories %}
+                                <option value="{{category.name}}" name="category">{{ category.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="">Date of Expense</label>
-                    <input type="date" class="form-control form-control-sm" name="expense_date" value="{{values.date}}">
+                <div class="form-group row m-2">
+                    <label for="" class="col-sm-3 col-form-label">Date of Expense</label>
+                    <div class="col-sm-8">
+                        <input type="date" class="form-control form-control-sm" value="{{values.date}}" name="expense_date">
+                    </div>
                 </div>
-                <input type="submit" value="Submit" class="btn btn-primary">
+                <div class="row m-3">
+                    <input type="submit" value="Submit" class=" col-md-2 btn btn-primary">
+                    <div class="col-md-2">
+                        <a href="{% url 'delete-expense' expense.id %}" class="btn btn-danger">Delete</a>
+                    </div>
+                </div>
             </form>
         </div>
     </div>
 
 </div>
-
-
-
 {% endblock %}

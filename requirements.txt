@@ -1,0 +1,6 @@
+Login page:
+    - message should go in 6 second
+    - have a close sign on it
+    - forgot password
+    - username value should not vanish
+    - create customized required message

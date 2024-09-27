@@ -3,9 +3,16 @@
   transition: all;
 }
 
+
 .showPasswordToggle:hover{
   transform: scale(1.2);
 }
+
+html, body {
+  height: 100vh;
+}
+
+
 
 .bd-placeholder-img {
     font-size: 1.125rem;
@@ -84,3 +91,12 @@
     display: block !important;
   }
 
+
+  .logo{
+    height: inherit;
+    width: inherit;
+  }
+
+  .table-output{
+    display: none;
+  }

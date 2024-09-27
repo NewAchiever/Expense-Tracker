@@ -12,6 +12,8 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.contrib.sites.shortcuts import get_current_site
 from .utils import account_activation_token
 from django.contrib import auth
+
+
 # Create your views here.
 class RegistrationView(View):
     def get(self, request):
@@ -19,13 +21,10 @@ class RegistrationView(View):
     def post(self, request):
         #messages.success(request, 'Success whatsapp');
         #return render(request, 'authentication/registration.html')
-
         #-----------------
         # get user data
         # validate
         # create a user account
-        
-
 
         username = request.POST['username']
         email = request.POST['email']
@@ -34,7 +33,6 @@ class RegistrationView(View):
         context = {
             'fieldValues': request.POST
         }
-
 
         if not User.objects.filter(username=username).exists():
             if not User.objects.filter(email=email).exists():
@@ -71,7 +69,7 @@ class RegistrationView(View):
                 email.send(fail_silently = False)
                 messages.success(request, 'Account successfully created')
                 return render(request, 'authentication/registration.html')
-            
+        messages.error(request, 'Account already exists')
         return render(request, 'authentication/registration.html')
 
 
@@ -92,17 +90,35 @@ class VerificationView(View):
             pass
         return redirect('login')
 
+
 class LoginView(View):
     def get(self, request):
+        
+        if request.COOKIES.get('user_id') != None:
+            print("cookie" + request.COOKIES.get('user_id'))
+            user = User.objects.get(id=request.COOKIES.get('user_id'))
+            auth.login(request, user)
+            context={
+                'user': user
+            }
+            response = redirect('expenses', context)
+            messages.success(request, 'Welcome back, '+ user.username)
+            return response
         return render(request, 'authentication/login.html')
-    
     
     def post(self, request):
         username = request.POST['username']
         password = request.POST['password']
-
+        user = None
+        
+        if request.COOKIES.get('user_id') != None:
+            user = User.objects.get(id=request.COOKIES.get('user_id'))
+            auth.login(request, user)
+            response = redirect('expenses')
+            messages.success(request, 'Welcome back, '+ user.username)
+            return response
+        
         if username and password: 
-            user = None
             if  User.objects.filter(username=username).exists():
                 user = User.objects.get(username=username)
                 if not user.check_password(password):
@@ -111,8 +127,11 @@ class LoginView(View):
             if user:
                 if user.is_active:
                     auth.login(request, user)
+                    response = redirect('expenses')
+                    if 'remember' in request.POST:
+                        response.set_cookie(key='user_id', value=user.id)
                     messages.success(request, 'Welcome, '+ user.username + ' You are now logged in.')
-                    return redirect('expenses')
+                    return response
                 messages.error(request, 'Account is not active, please check your email.')
                 return render(request, 'authentication/login.html')
             messages.error(request, 'Invalid credentials. Try again.')
@@ -144,5 +163,8 @@ class EmailValidationView(View):
 class LogoutView(View):
     def post(self, request):
         auth.logout(request)
-        messages.success(request, 'Yu have been logged out.')
-        return redirect('login')
+        del request.session
+        response = redirect('login')
+        response.delete_cookie(key='user_id')
+        messages.success(request, 'You have been logged out.')
+        return response

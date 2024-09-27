@@ -1,0 +1,311 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+
+<div class="container mt-4">
+    <div class="row m-3">
+        <div class="col-md-9">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                  <li class="breadcrumb-item"><a href=""  class="text-decoration-none">Income</a></li>
+                  <li class="breadcrumb-item active" aria-current="page">My Income</li>
+                </ol>
+            </nav>
+        </div>
+        
+        <div class="col-md-2">
+            <a href="{% url 'add-income' %}" class="btn btn-primary float-end">Add Income</a>
+        </div>
+
+    </div>
+    <div class="mt-4">
+        {% include 'partials/_messages.html' %}
+        <div class="d-flex py-2 align-items-center">
+            <img src="{% static 'icons/filter.png' %}" style="height:16px;width:16px"/>
+            <span  class="mx-1" onclick="document.querySelector('#filterDiv').toggleAttribute('hidden')">Add Filter</span>
+        </div>
+        <div class="bg-body-tertiary p-2 position-relative" id="filterDiv" hidden>
+            <button type="button" onclick="document.querySelector(`#filterDiv`).toggleAttribute('hidden')" class="btn-close position-absolute top-0 end-0 m-2" style="height:5px;width:5px" aria-label="Close"></button>
+            <form class="row px-2 g-0" id="apply-filter-incomes" method="post"> 
+                {% csrf_token %}
+                <div class="col g-0 mx-2">
+                    <label class="my-2">
+                        Amount Range:
+                    </label>
+                    <div class="row g-0">
+                        <div class="col-5">
+                            <input type="number" name="f_gt_amount" id="f_gt_amount" class="rounded-left w-100 p-2 border-0" placeholder="From"/>
+                        </div>
+                        <span class="bg-white m-0 p-1" style="width:20px">-</span>
+                        <div class="col-5">
+                            <input type="number" name="f_lt_amount" value="{{fieldValues.f_lt_amount}}" class="w-100 p-2 border-0" placeholder="To"/>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col col-2 g-0 mx-2">
+                    <label class="my-2">
+                        Source:
+                    </label>
+                    <div class="row g-0">
+                        <div class="dropdown" id="sourceDropDownMenuParent">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" id="sourceDropDownMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Dropdown
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="sourceDropDownMenu" id="sourceMenu">
+                                {% for source in sources %}
+                                    <button class="dropdown-item" id="dropDownSourceItem" type="button"><input type="checkbox" name="{{source}}" id="f_so_{{source}}" value="{{source}}" class="mx-1 pb-0 align-items-center" style="height:15px;width:15px"><span class="justify-center align-items-center">{{source}}</span></button>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col g-0 mx-2">
+                    <label class="my-2">
+                        Description:
+                    </label>
+                    <div class="row g-0">
+                        <div class="col">
+                            <input type="text" name="f_description" value="{{fieldValues.f_description}}" class="rounded-left w-100 p-2 border-0" placeholder="Descript"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="col g-0 mx-2">
+                    <label class="my-2">
+                        Date Range:
+                    </label>
+                    <div class="row g-0">
+                        <div class="col-md-6">
+                            <input type="date" name="f_gt_date" class="rounded-left w-100 p-2 border-0"  value="{{fieldValues.f_gt_date}}" placeholder="Date"/>
+                        </div>
+                        <span class="bg-white m-0 p-1" style="width:20px">-</span>
+                        <div class="col-md-5">
+                            <input type="date" name="f_lt_date" class="w-100 p-2 border-0"  value="{{fieldValues.f_lt_date}}" placeholder="Date"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-8"></div>
+                    <div class="col-md-4">
+                        <input type="submit" name="submit" class="btn btn-primary float-end" id="submit-filter" value="Apply Filter"/>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <table class="table table-bordered mt-4 table-hover">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Amount ({{currency}})</th>
+                    <th>Source</th>
+                    <th>Description</th>
+                    <th colspan="2">Date</th>
+                    
+                </tr>
+            </thead>
+            <tbody id="incomes-table">
+                {% for income in incomes %}
+                <tr>
+                    <td>{{forloop.counter}}</td>
+                    <td>{{income.amount}}</td>
+                    <td>{{income.source}}</td>
+                    <td>{{income.description}}</td>
+                    <td>{{income.date}}</td>
+                    <td><a href="{% url 'edit-income' income.id %}" class="btn btn-primary btn-small">Edit</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<!-- <div class="container">
+    {% include 'partials/_messages.html' %}
+    {% if income.count %}
+    <div class="row">
+        <div class="col-md-8"></div>
+        <div class="col md-4">
+            <div class="form-group">
+                <input type="text" class="form-control" id="searchField" placeholder="Search">
+            </div>    
+        </div>
+    </div>
+
+    
+     <div class="app-table">
+        <table class="table table-stripped table-hover">
+            <thead>
+                <tr>
+                    <th>Amount ({{currency}})</th>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th>Date</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for expense in page_obj %}
+                    <tr>
+                        <td>{{expense.amount}}</td>
+                        <td>{{expense.category}}</td>
+                        <td>{{expense.description}}</td>
+                        <td>{{expense.date}}</td>
+                        <td><a href="{% url 'edit-expense' expense.id %}" class="btn btn-secondary btn-small">Edit</a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+    <div class="table-output">
+        <table class="table table-stripped table-hover">
+            <thead>
+                <tr>
+                    <th>Amount (CURRENCY)</th>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th>Date</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody class="table-body">
+ 
+            </tbody>
+        </table>
+    </div>
+
+
+    <div class="pagination-container">
+        <div>
+            Showing page {{page_obj.number}} of {{ page_obj.paginator.num_pages }}
+        </div>
+        <nav aria-label="...">  
+            <ul class="pagination align-right float-right mr-auto">
+              {% if page_obj.has_previous %}
+                <li {% if page_obj.number == 1 %} class="page-item disabled" {% endif %}>
+                    <a class="page-link" href="?page{{page_obj.previous_page_number}}">Previous</a>
+                </li>
+              {% endif %}         
+              {% if page_obj.has_next %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{page_obj.next_page_number}}">Next</a>
+              </li>
+              {% endif %}
+            </ul>
+          </nav>
+    </div>
+
+    {% endif %}
+</div>    -->
+
+<script src="{% static 'js/searchIncome.js' %}"></script>
+<script>
+    const applyFilterIncomes = document.getElementById('apply-filter-incomes');
+    const sourceDropDownButton = document.getElementById('sourceDropDownMenu');
+
+    sourceDropDownButton.addEventListener('click', function(event){
+        const parent = document.getElementById('sourceDropDownMenuParent')
+        this.toggleAttribute('aria-expanded')
+        document.getElementById('sourceMenu').classList.toggle('show')
+        parent.classList.toggle('show')
+    });
+
+    function getCookie(cname) {
+        let name = cname + "=";
+        let decodedCookie = decodeURIComponent(document.cookie);
+        let ca = decodedCookie.split(';');
+        for(let i = 0; i <ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+        }
+        return "";
+    }
+
+    
+applyFilterIncomes.addEventListener('submit', function(event) {
+    event.preventDefault();  
+    data = {}
+    // Get form data
+    const formData = new FormData(event.target);        
+    if(formData.get('f_gt_amount') != ''){
+    data['f_gt_amount'] = (parseFloat(formData.get('f_gt_amount')))
+    }
+    if(formData.get('f_lt_amount') != ''){
+    data['f_lt_amount'] = (parseFloat(formData.get('f_lt_amount')))
+    }
+    if(formData.get('f_description') != null && formData.get('f_description') != ''){
+    data['f_description'] = (formData.get('f_description'))
+    }
+    if(formData.get('f_gt_date') != ''){
+    data['f_gt_date'] = (formData.get('f_gt_date'))
+    }
+    if(formData.get('f_lt_date') != ''){
+    data['f_lt_date'] = (formData.get('f_gt_date'))
+    }
+
+    const sourceMenu = document.getElementById('sourceMenu')
+    
+    for(var child=sourceMenu.children[0]; child!==null; child=child.nextElementSibling) {
+        input = child.children[0]
+        if(input.checked){            
+            console.log(input.id)
+            data[input.id] = input.checked
+        }
+    }
+
+    console.log(data)
+    // Send AJAX request using Fetch API
+    fetch("filter-income/", {
+        method: 'POST',
+        credentials: "same-origin",
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            "X-CSRFToken": getCookie("csrftoken"),
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Hide the spinner
+        //document.getElementById('loading-spinner').style.display = 'none';
+        console.log(data)
+        // Get the product list div
+        const productListDiv = document.getElementById('incomes-table');
+        productListDiv.innerHTML = '';  // Clear the current list
+
+        // Update the product list with filtered results
+        if (data.length > 0) {
+            data.forEach((income, i) => {
+            console.log(income.amount)
+                productListDiv.innerHTML += `
+                    <tr>
+                    <td>${i+1}</td>
+                    <td>${income.amount}</td>
+                    <td>${income.source}</td>
+                    <td>${income.description}</td>
+                    <td>${income.date}</td>
+                    <td><a href="/edit-income/${income.id}" class="btn btn-primary btn-small">Edit</a></td>
+                    </tr>`;
+                    
+            });
+        } else {
+            productListDiv.innerHTML = '<p>No Search found.</p>';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+});
+
+</script>
+{% endblock content %}
+
+ 
