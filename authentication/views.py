@@ -3,6 +3,7 @@ from django.views import View
 import json
 from django.http import JsonResponse
 from django.contrib.auth.models import User
+from userpreferences.models import UserPreference
 from validate_email import validate_email
 from django.contrib import messages
 from django.core.mail import EmailMessage
@@ -44,6 +45,7 @@ class RegistrationView(View):
 
                 user.is_active = False
                 user.save()
+                UserPreference.objects.create(user=user)
 
                 # path_to_view
                 # - getting domain we are on

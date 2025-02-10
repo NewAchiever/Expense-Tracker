@@ -5,7 +5,7 @@
 
 {% block content %}
 <div class="container mt-4">
-    <div class="row m-1">
+    <div class="row m-1  d-flex justify-content-between">
         <div class="col-md-9">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb float-start">
@@ -14,8 +14,8 @@
                 </ol>
             </nav>
         </div>
-        <div class="col-md-2">
-            <a href="{% url 'add-expense' %}" class="btn btn-primary float-end">Add Expense</a>
+        <div class="col-md-2  d-flex justify-content-end">
+            <a href="{% url 'add-expense' %}" class="btn btn-primary btn-lg">Add Expense</a>
         </div>
     </div>
 </div>
@@ -25,6 +25,9 @@
     <div class="d-flex py-2 align-items-center">
         <img src="{% static 'icons/filter.png' %}" style="height:16px;width:16px"/>
         <span  class="mx-1" onclick="document.querySelector('#filterDiv').toggleAttribute('hidden')">Add Filter</span>
+        <div class="my-3" id="expensesFilterTags">
+
+        </div>
     </div>
     <div class="bg-body-tertiary p-2 position-relative border border-1" id="filterDiv" hidden>
         <button type="button" onclick="document.querySelector(`#filterDiv`).toggleAttribute('hidden')" class="btn-close position-absolute top-0 end-0 m-2" style="height:5px;width:5px" aria-label="Close"></button>
@@ -36,11 +39,11 @@
                 </label>
                 <div class="row g-0">
                     <div class="col-5">
-                        <input type="number" name="f_gt_amount" id="f_gt_amount" class="rounded-left w-100 p-2 border-0" placeholder="From"/>
+                        <input type="number" name="f_gt_amount" id="f_gt_amount_expense"  value="{{fieldValues.f_gt_amount}}" class="rounded-left w-100 p-2 border-0" placeholder="From"/>
                     </div>
                     <span class="bg-white m-0 p-1" style="width:20px">-</span>
                     <div class="col-5">
-                        <input type="number" name="f_lt_amount" id="f_lt_amount" value="{{fieldValues.f_lt_amount}}" class="w-100 p-2 border-0" placeholder="To"/>
+                        <input type="number" name="f_lt_amount"  id="f_lt_amount_expense"  value="{{fieldValues.f_lt_amount}}" class="w-100 p-2 border-0" placeholder="To"/>
                     </div>
                 </div>
             </div>
@@ -51,12 +54,12 @@
                 </label>
                 <div class="row g-0">
                     <div class="dropdown" id="categoryDropDownMenuParent">
-                        <button class="btn btn-secondary dropdown-toggle" type="button" id="categoryDropDownMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" id="categoryDropDownMenu" data-toggle="dropdown"  aria-expanded="false">
                             Dropdown
                         </button>
                         <div class="dropdown-menu" aria-labelledby="categoryDropDownMenu" id="categoryMenu">
                             {% for category in categories %}
-                                <button class="dropdown-item" id="dropDownCategoryItem" type="button"><input type="checkbox" name="{{category}}" id="f_ca_{{category}}" value="{{category}}" class="mx-1 pb-0 align-items-center" style="height:15px;width:15px"><span class="justify-center align-items-center">{{category}}</span></button>
+                                <button class="dropdown-item" type="button"><input type="checkbox" name="{{category}}" id="f_ca_{{ category }}" value="{{category}}" class="mx-1 pb-0 align-items-center" style="height:15px;width:15px"><span class="justify-center align-items-center">{{category}}</span></button>
                             {% endfor %}
                         </div>
                     </div>
@@ -68,7 +71,7 @@
                 </label>
                 <div class="row g-0">
                     <div class="col">
-                        <input type="text" name="f_description" value="{{fieldValues.f_description}}" class="rounded-left w-100 p-2 border-0" placeholder="Descript"/>
+                        <input type="text" name="f_description" id="f_description_expense" value="{{fieldValues.f_description}}" class="rounded-left w-100 p-2 border-0" placeholder="Description"/>
                     </div>
                 </div>
             </div>
@@ -78,11 +81,11 @@
                 </label>
                 <div class="row g-0">
                     <div class="col-md-6">
-                        <input type="date" name="f_gt_date" class="rounded-left w-100 p-2 border-0"  value="{{fieldValues.f_gt_date}}" placeholder="Date"/>
+                        <input type="date" name="f_gt_date" id="f_gt_date_expense" class="rounded-left w-100 p-2 border-0"  value="{{fieldValues.f_gt_date}}" placeholder="Date"/>
                     </div>
                     <span class="bg-white m-0 p-1" style="width:20px">-</span>
                     <div class="col-md-5">
-                        <input type="date" name="f_lt_date" class="w-100 p-2 border-0"  value="{{fieldValues.f_lt_date}}" placeholder="Date"/>
+                        <input type="date" name="f_lt_date" id="f_lt_date_expense" class="w-100 p-2 border-0"  value="{{fieldValues.f_lt_date}}" placeholder="Date"/>
                     </div>
                 </div>
             </div>
@@ -94,9 +97,7 @@
             </div>
         </form>
     </div>
-    <div class="my-3" id="expensesFilterTags">
-
-    </div>
+    
     {% if expenses.count %}
     <div class="mt-4">
         

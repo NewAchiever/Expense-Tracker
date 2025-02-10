@@ -8,6 +8,7 @@ from userpreferences.models import UserPreference
 from django.http import JsonResponse
 # Create your views here.
 
+
 def search_expenses(request):
     if request.method == 'POST':
         search_str = json.loads(request.body).get('searchText')
@@ -20,17 +21,16 @@ def search_expenses(request):
         return JsonResponse(list(data), safe=False)
 
 def filter_expenses(request):
-    print(request.POST.dict())
+    
     if request.method == 'POST':
         amount_start = json.loads(request.body).get('f_gt_amount')
         amount_end = json.loads(request.body).get('f_lt_amount')
         date_start = json.loads(request.body).get('f_gt_date')
         date_end = json.loads(request.body).get('f_lt_date')
         categories = [x[5:] for x in json.loads(request.body).keys() if x.startswith('f_ca')]
-        print(categories)
-        description = request.POST.get('f_description')
+        description = json.loads(request.body).get('f_description')
         result = Expense.objects.filter(owner=request.user)
-        
+        print(description)
         if len(categories):
             result = Expense.objects.filter(category=categories[0], owner=request.user)
             for ca in categories[1:]:
@@ -43,7 +43,7 @@ def filter_expenses(request):
         if date_start is not None:
             result = result.filter(date__gte=date_start, owner=request.user)
         if date_end is not None:
-            result = result.filter(date__lte=date_start, owner=request.user)
+            result = result.filter(date__lte=date_end, owner=request.user)
         if description is not None:
             result = result.filter(description__istartswith=description, owner=request.user)    
         data = result.values()
@@ -51,6 +51,7 @@ def filter_expenses(request):
 
 @login_required(login_url='/authentication/login')
 def index(request):
+    
     categories = Category.objects.all()
     expenses=Expense.objects.filter(owner=request.user).order_by('owner')
     paginator = Paginator(expenses, 1000)

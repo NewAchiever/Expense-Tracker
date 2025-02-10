@@ -7,10 +7,10 @@ import json
 from userpreferences.models import UserPreference
 from django.http import JsonResponse
 from userpreferences.models import UserPreference
-# Create your views here.
 
+# Create your views here.
 def filter_incomes(request):
-    print(request.POST.dict())
+    print("DATA: " , request.POST.dict())
     if request.method == 'POST':
         amount_start = json.loads(request.body).get('f_gt_amount')
         amount_end = json.loads(request.body).get('f_lt_amount')
@@ -18,14 +18,14 @@ def filter_incomes(request):
         date_end = json.loads(request.body).get('f_lt_date')
         sources = [x[5:] for x in json.loads(request.body).keys() if x.startswith('f_so')]
         print(sources)
-        description = request.POST.get('f_description')
+        description = json.loads(request.body).get('f_description')
         result = UserIncome.objects.filter(owner=request.user)
         
         if len(sources):
             result = UserIncome.objects.filter(source=sources[0], owner=request.user)
             for so in sources[1:]:
                 result = result | UserIncome.objects.filter(source=so, owner=request.user)
-                print("result : ", result)
+                
         if amount_start is not None:
             result = result.filter(amount__gte=amount_start, owner=request.user)
         if amount_end is not None:
@@ -33,7 +33,7 @@ def filter_incomes(request):
         if date_start is not None:
             result = result.filter(date__gte=date_start, owner=request.user)
         if date_end is not None:
-            result = result.filter(date__lte=date_start, owner=request.user)
+            result = result.filter(date__lte=date_end, owner=request.user)
         if description is not None:
             result = result.filter(description__istartswith=description, owner=request.user)    
         data = result.values()

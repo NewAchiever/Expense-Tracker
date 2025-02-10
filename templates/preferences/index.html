@@ -12,9 +12,7 @@
           
           {% if user_preferences.currency %}
               <option name="currency" value="{{user_preferences.currency}}" selected>{{user_preferences.currency}}</option>
-          {% endif %}
-          
-          
+          {% endif %}          
           {% for currency in currencies %}
             <option value="{{ currency.name }} - {{currency.value}}">{{ currency.name }} - {{currency.value}}</option>
           {% endfor %}
