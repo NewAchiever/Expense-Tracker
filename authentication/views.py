@@ -12,6 +12,8 @@ from django.utils.encoding import force_bytes, force_str, DjangoUnicodeDecodeErr
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.contrib.sites.shortcuts import get_current_site
 from .utils import account_activation_token
+from django.contrib.auth.tokens import default_token_generator
+from django.urls import reverse_lazy
 from django.contrib import auth
 
 
@@ -62,13 +64,13 @@ class RegistrationView(View):
 
                 email_subject = 'Activate your account'
                 email_body = 'Hi '+user.username + '\n\nPlease use this link to verify your account\n' + activate_url
-                email = EmailMessage(
+                email_obj = EmailMessage(
                     email_subject,
                     email_body,
                     "fortestingonly090@gmail.com",
                     [email]
                 )
-                email.send(fail_silently = False)
+                email_obj.send(fail_silently = False)
                 messages.success(request, 'Account successfully created')
                 return render(request, 'authentication/registration.html')
         messages.error(request, 'Account already exists')
@@ -95,7 +97,6 @@ class VerificationView(View):
 
 class LoginView(View):
     def get(self, request):
-        
         if request.COOKIES.get('user_id') != None:
             print("cookie" + request.COOKIES.get('user_id'))
             user = User.objects.get(id=request.COOKIES.get('user_id'))
@@ -170,3 +171,69 @@ class LogoutView(View):
         response.delete_cookie(key='user_id')
         messages.success(request, 'You have been logged out.')
         return response
+
+class ResetPasswordView(View):
+    def get(self, request):
+        response = render(request, 'authentication/email-reset-password-link.html')
+        return response
+    
+    def post(self, request):
+        email = request.POST['email']
+        if User.objects.filter(email=email).exists():
+            user = User.objects.get(email=email)
+            token = account_activation_token.make_token(user)
+            # Generate the password reset URL
+            uidb64 = urlsafe_base64_encode(force_bytes((user.pk)))
+            link = reverse('confirm-reset-password', kwargs={'uidb64': uidb64, 'token': token})
+
+            domain = get_current_site(request).domain
+            
+            activate_url = 'http://'+domain+link
+
+            email_subject = 'Reset your Password'
+            email_body = 'Hi '+ user.username + '\n\nPlease use this link to reset your password\n' + activate_url
+            email_obj = EmailMessage(
+                email_subject,
+                email_body,
+                "fortestingonly090@gmail.com",
+                [email]
+            )
+            email_obj.send(fail_silently = False)            
+            messages.success(request, 'Password reset link has been sent to ' + email + '.')
+            response = render(request, 'authentication/email-reset-password-link.html')
+            return response
+        else:
+            messages.error(request, 'Unfortunately, ' + email + ' is not registered with us.')
+            response = render(request, 'authentication/email-reset-password-link.html')
+            return response
+        
+class ConfirmResetPasswordView(View):
+    def get(self, request, uidb64, token):
+        try:
+            pk_id = force_str(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(pk=pk_id)
+            if not account_activation_token.check_token(user, token):
+                messages.error(request, "The link is either expired or broken, Try again.")
+                return redirect('reset-password')
+            request.session["user"] = user.pk
+            return render(request, 'authentication/set-newpassword.html')
+        except Exception as ex:
+             messages.error(request, ex)
+             return redirect('reset-password')
+
+class ChangePassword(View):
+    def post(self, request):
+        password = request.POST['password']
+        try:
+            user_id = request.session['user']
+            user = User.objects.get(pk=user_id)
+            user.set_password(password)
+            user.save()
+            del request.session['user']
+            messages.success(request, 'Password changed successfully!')
+            return redirect('login')
+        except:
+            messages.success(request, 'Password didn\'t changed successfully!')
+            return redirect('login')
+
+        

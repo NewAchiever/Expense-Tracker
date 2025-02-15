@@ -145,12 +145,6 @@ DEFAULT_FROM_EMAIL = 'fortestingonly090@gmail.com'
 EMAIL_PORT = 587
 EMAIL_HOST_PASSWORD = 'uehu wkrigvyloyhp'
 
-"""
-from django.contrib.auth.models import User
-User.objects.all().delete()
-"""
-
-
 
 
 
