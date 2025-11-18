@@ -1,6 +1,6 @@
 #!/bin/bash
-sudo apt-get update
-sudo apt-get install libpq-dev python3-dev gcc
+apt-get update
+apt-get install libpq-dev python3-dev gcc
 
 python3 -m venv django-app
 source django-app/bin/activate
