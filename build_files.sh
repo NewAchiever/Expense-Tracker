@@ -11,5 +11,5 @@ python3 manage.py migrate --noinput
 
 python3 manage.py dbshell
 
-python3 manage.py runserver --noinput
+python3 manage.py runserver 
 
