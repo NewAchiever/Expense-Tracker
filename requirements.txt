@@ -36,7 +36,7 @@ parso==0.8.4
 pickleshare==0.7.5
 platformdirs==4.3.6
 prompt_toolkit==3.0.50
-psycopg2-binary==2.9.10
+psycopg[binary]==3.2.3
 pure_eval==0.2.3
 Pygments==2.19.1
 python-dateutil==2.9.0.post0
@@ -61,6 +61,7 @@ wcwidth==0.2.13
 webencodings==0.5.1
 whitenoise==6.9.0
 yarg==0.1.9
+
 
 
 
