@@ -8,3 +8,6 @@ pip install -r requirements.txt
 python3 manage.py collectstatic --noinput
 python3 manage.py makemigrations --noinput
 python3 manage.py migrate --noinput
+echo "=== PROJECT STRUCTURE ON VERCEL ==="
+find . -maxdepth 3 -type d
+echo "=== END ==="
