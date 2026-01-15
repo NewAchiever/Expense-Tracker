@@ -1,3 +1,4 @@
 django-app/
 /__pycache__/
 *.pyc
+.vercel

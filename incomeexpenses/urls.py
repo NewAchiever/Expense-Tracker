@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+
 urlpatterns = [
     path('', include('userincome.urls')),
     path('authentication/', include('authentication.urls')),
@@ -24,9 +25,3 @@ urlpatterns = [
     path('expense/', include('expenses.urls')),
     path('admin/', admin.site.urls),
 ]
-
-
-
-
-
- 

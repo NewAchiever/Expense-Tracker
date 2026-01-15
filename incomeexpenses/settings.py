@@ -12,24 +12,23 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
-import django_heroku
+from dotenv import load_dotenv
 from django.contrib import messages
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+load_dotenv('.env')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-7lo^7&$rl$7i4e##bgc%clfynfj%&tpd&s*5@^fa9k+ez8m7mk'
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEVELOPMENT_DEBUG')
 
 ALLOWED_HOSTS = ['*']
 
-DJANGO_SETTINGS_MODULE = 'incomeexpenses.settings'
 
 # Application definition
 
@@ -55,7 +54,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'incomeexpenses.urls'
+ROOT_URLCONF = os.getenv('ROOT_URLCONF')
 
 TEMPLATES = [
     {
@@ -81,12 +80,12 @@ WSGI_APPLICATION = 'incomeexpenses.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'incomeexpenseDB',
-        'USER': 'postgres',
-        'PASSWORD': 'admin',
-        'HOST': 'localhost',
-        'PORT': '5432'
+        'ENGINE': os.getenv('DB_ENGINE'),
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': os.getenv('DB_PORT')
     }
 }
 
@@ -126,9 +125,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'incomeexpenses\\static\\')]
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'incomeexpenses/static/')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-print(STATICFILES_DIRS)
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
@@ -140,12 +139,12 @@ MESSAGE_TAGS={
 
 
 #For email
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'fortestingonly090@gmail.com'
-EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = 'fortestingonly090@gmail.com'
-EMAIL_PORT = 587
-EMAIL_HOST_PASSWORD = 'uehu wkrigvyloyhp'
+EMAIL_HOST = os.getenv('EMAIL_HOST')
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')
+EMAIL_PORT = os.getenv('EMAIL_PORT')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 
 
 
